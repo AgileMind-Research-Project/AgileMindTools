@@ -8,11 +8,21 @@ from sqlalchemy import text
 import logging
 import json
 from atlassian import Jira
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+# Configuration: Jira Custom Field IDs
+# Change these to match your Jira instance's custom field IDs
+# To find your custom field IDs:
+# 1. Go to Jira Admin > Issues > Custom Fields
+# 2. Or use the API: /rest/api/3/field
+# 3. Or inspect element on a Jira issue page
+SEVERITY_FIELD_ID = 'customfield_10165'
+STORY_POINTS_FIELD_ID = 'customfield_10035'  # Story Points field
+START_DATE_FIELD_ID = 'customfield_10015'    # Start Date field
 
 
 def get_all_project(tenant):
@@ -26,7 +36,7 @@ def get_all_project(tenant):
         List of project dictionaries with project_id, project_name, and key
     """
     try:
-        project_query = "SELECT project_id, project_name, `key` FROM projects"
+        project_query = "SELECT project_id, project_name, `key` FROM projects where project_id = 10270"
         projects_df = read_from_mysql_with_params(project_query, {}, tenant)
         
         # Check if DataFrame is empty before converting
@@ -232,6 +242,70 @@ def transform_jira_issue(issue, project_id):
         # Extract labels (tags) as a list for JSON storage
         labels = fields.get('labels', [])
         
+        # Extract Severity custom field (uses SEVERITY_FIELD_ID constant)
+        # Severity is stored as a list/object in custom fields
+        severity = None
+        
+        # Try to extract severity from the custom field
+        if SEVERITY_FIELD_ID in fields and fields[SEVERITY_FIELD_ID]:
+            severity_value = fields[SEVERITY_FIELD_ID]
+            
+            # Handle if it's a list of objects
+            if isinstance(severity_value, list) and len(severity_value) > 0:
+                item = severity_value[0]
+                if isinstance(item, dict):
+                    severity = item.get('value') or item.get('name')
+                else:
+                    severity = str(item)
+            # Handle if it's an object with value/name attribute
+            elif isinstance(severity_value, dict):
+                severity = severity_value.get('value') or severity_value.get('name')
+            # Handle if it's a plain string
+            elif isinstance(severity_value, str):
+                severity = severity_value
+            else:
+                severity = str(severity_value)
+            
+            # Normalize to lowercase if found
+            if severity:
+                severity = str(severity).lower()
+                logger.info(f"Found severity '{severity}' in field '{SEVERITY_FIELD_ID}' for issue {issue_key}")
+        
+        # Fallback: check if there's a 'severity' field directly (some Jira instances)
+        if not severity and 'severity' in fields and fields['severity']:
+            severity_obj = fields['severity']
+            if isinstance(severity_obj, dict):
+                severity = severity_obj.get('value', severity_obj.get('name', ''))
+            elif isinstance(severity_obj, str):
+                severity = severity_obj
+            
+            if severity:
+                severity = str(severity).lower()
+        
+        # Extract Story Points custom field
+        story_points = None
+        
+        # Try to extract story points from the custom field
+        if STORY_POINTS_FIELD_ID in fields and fields[STORY_POINTS_FIELD_ID] is not None:
+            story_points_value = fields[STORY_POINTS_FIELD_ID]
+            
+            # Handle different data types for story points
+            try:
+                # Story points can be int, float, or string representing a number
+                if isinstance(story_points_value, (int, float)):
+                    story_points = int(story_points_value)
+                elif isinstance(story_points_value, str):
+                    # Try to convert string to int
+                    story_points = int(float(story_points_value))
+                else:
+                    logger.warning(f"Unexpected story points format for issue {issue_key}: {type(story_points_value)}")
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Could not parse story points for issue {issue_key}: {story_points_value} - {str(e)}")
+                story_points = None
+            
+            if story_points is not None:
+                logger.info(f"Found story points '{story_points}' in field '{STORY_POINTS_FIELD_ID}' for issue {issue_key}")
+        
         # Extract dates
         created_at = fields.get('created')
         updated_at = fields.get('updated')
@@ -258,6 +332,72 @@ def transform_jira_issue(issue, project_id):
                     logger.warning(f"Could not parse updated_at date: {updated_at}")
                     updated_at = None
         
+        # Extract Start Date from custom field
+        jira_start_date = fields.get(START_DATE_FIELD_ID)
+        start_date = None
+        end_date = None
+        
+        # Use Jira start date if available
+        if jira_start_date:
+            try:
+                # Jira start date is in format 'YYYY-MM-DD'
+                start_date = datetime.strptime(jira_start_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+                logger.info(f"Found start date '{start_date}' in field '{START_DATE_FIELD_ID}' for issue {issue_key}")
+            except Exception as e:
+                logger.warning(f"Could not parse start date: {jira_start_date} - {str(e)}")
+                # Fallback to created date
+                if created_at:
+                    try:
+                        start_date = datetime.strptime(created_at, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                    except:
+                        start_date = datetime.now().strftime('%Y-%m-%d')
+                else:
+                    start_date = datetime.now().strftime('%Y-%m-%d')
+        else:
+            # Fallback to created date if no custom start date
+            if created_at:
+                try:
+                    start_date = datetime.strptime(created_at, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                except:
+                    try:
+                        if 'T' in str(created_at):
+                            start_date = datetime.strptime(str(created_at)[:10], '%Y-%m-%d').strftime('%Y-%m-%d')
+                        else:
+                            start_date = datetime.now().strftime('%Y-%m-%d')
+                    except:
+                        start_date = datetime.now().strftime('%Y-%m-%d')
+            else:
+                start_date = datetime.now().strftime('%Y-%m-%d')
+        
+        # Extract due date for end_date
+        due_date = fields.get('duedate')
+        
+        # Use due date as end_date if available, otherwise add 14 days to start_date
+        if due_date:
+            try:
+                end_date = datetime.strptime(due_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+            except:
+                logger.warning(f"Could not parse due date: {due_date}")
+                # Fallback: add 14 days to start date
+                end_date = (datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=14)).strftime('%Y-%m-%d')
+        else:
+            # Default: add 14 days to start date (typical sprint length)
+            end_date = (datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=14)).strftime('%Y-%m-%d')
+        
+        # Extract estimated hours from time tracking
+        # Jira stores time in seconds in timeoriginalestimate
+        estimated_hours = 0
+        time_estimate_seconds = fields.get('timeoriginalestimate')
+        
+        if time_estimate_seconds:
+            try:
+                # Convert seconds to hours (round to nearest integer)
+                estimated_hours = int(round(time_estimate_seconds / 3600))
+                logger.info(f"Found estimated hours '{estimated_hours}' (from {time_estimate_seconds} seconds) for issue {issue_key}")
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Could not parse time estimate for issue {issue_key}: {time_estimate_seconds} - {str(e)}")
+                estimated_hours = 0
+        
         return {
             'id': issue_key,
             'project_id': project_id,
@@ -269,7 +409,12 @@ def transform_jira_issue(issue, project_id):
             'assignee': assignee,
             'tags': json.dumps(labels) if labels else None,  # Store as JSON string
             'created_at': created_at,
-            'updated_at': updated_at
+            'updated_at': updated_at,
+            'severity': severity,  # Add severity field
+            'story_points': story_points,  # Add story points field
+            'estimated_hours': estimated_hours,  # Add estimated hours
+            'start_date': start_date,  # Add start_date
+            'end_date': end_date  # Add end_date
         }
         
     except Exception as e:
@@ -393,9 +538,9 @@ def insert_backlog_items(backlog_items, tenant):
         # The id (Jira issue key) is the primary key, so duplicates will be updated
         insert_query = """
         INSERT INTO project_backlog 
-        (id, project_id, summary, description, issue_type, status, priority, assignee, tags, created_at, updated_at)
+        (id, project_id, summary, description, issue_type, status, priority, assignee, tags, created_at, updated_at, severity, story_points, estimated_hours, start_date, end_date)
         VALUES 
-        (:id, :project_id, :summary, :description, :issue_type, :status, :priority, :assignee, :tags, :created_at, :updated_at)
+        (:id, :project_id, :summary, :description, :issue_type, :status, :priority, :assignee, :tags, :created_at, :updated_at, :severity, :story_points, :estimated_hours, :start_date, :end_date)
         ON DUPLICATE KEY UPDATE
             summary = VALUES(summary),
             description = VALUES(description),
@@ -404,7 +549,12 @@ def insert_backlog_items(backlog_items, tenant):
             priority = VALUES(priority),
             assignee = VALUES(assignee),
             tags = VALUES(tags),
-            updated_at = VALUES(updated_at)
+            updated_at = VALUES(updated_at),
+            severity = VALUES(severity),
+            story_points = VALUES(story_points),
+            estimated_hours = VALUES(estimated_hours),
+            start_date = VALUES(start_date),
+            end_date = VALUES(end_date)
         """
         
         success_count = 0

@@ -1,0 +1,30 @@
+============================================================
+AI BACKLOG PRIORITIZATION REPORT
+Trained on: GFG_FINAL.csv | Applied to: b.py backlog
+============================================================
+Generated: 2026-01-06 07:20:26.051527
+
+Training Data Size: 15 items
+Backlog Size: 13 items
+
+Learned Coefficients:
+  - Priority Weight: 2.000
+  - Severity Weight: 2.000
+  - Bug Boost: 1.300
+
+------------------------------------------------------------
+PRIORITIZED BACKLOG:
+------------------------------------------------------------
+# 1 | Notification badge count incorrect                 | Type: bug   | WSJF:  4.36 | MoSCoW: Should Have
+# 2 | Security review & dependency audit                 | Type: story | WSJF:  9.05 | MoSCoW: Must Have
+# 3 | Project initialization & repo setup                | Type: story | WSJF:  6.69 | MoSCoW: Should Have
+# 4 | Deployment: staging environment                    | Type: story | WSJF:  5.96 | MoSCoW: Should Have
+# 5 | Automated tests: unit & integration                | Type: story | WSJF:  4.80 | MoSCoW: Could Have
+# 6 | Core API: CRUD for primary resource                | Type: story | WSJF:  4.53 | MoSCoW: Could Have
+# 7 | Backlog grooming & roadmap planning                | Type: story | WSJF:  2.53 | MoSCoW: Should Have
+# 8 | End-to-end (E2E) smoke tests                       | Type: story | WSJF:  8.43 | MoSCoW: Could Have
+# 9 | Data protection & backup plan                      | Type: story | WSJF:  6.30 | MoSCoW: Must Have
+#10 | User documentation & API docs                      | Type: story | WSJF:  5.96 | MoSCoW: Should Have
+#11 | Logging & monitoring baseline                      | Type: story | WSJF:  3.84 | MoSCoW: Must Have
+#12 | Legal & compliance checklist                       | Type: story | WSJF:  6.12 | MoSCoW: Must Have
+#13 | Performance baseline & profiling plan              | Type: story | WSJF:  2.29 | MoSCoW: Could Have
