@@ -330,6 +330,120 @@ def insert_subtask(data, tenant):
     return execute_query(query, data, tenant)
 
 # -----------------------
+# Create notification for subtask creation
+# -----------------------
+def create_subtask_notification(project_id, parent_task_count, subtask_count, tenant):
+    """
+    Create a notification for project managers when subtasks are auto-generated.
+    Directly inserts into notifications table.
+    
+    Args:
+        project_id: Project ID
+        parent_task_count: Number of parent tasks processed
+        subtask_count: Number of subtasks created
+        tenant: Tenant database name
+    """
+    try:
+        logger.info(f"[NOTIFICATION] Starting notification creation for project {project_id}")
+        
+        # Get project details and project managers
+        project_query = """
+        SELECT project_name, project_manager
+        FROM projects
+        WHERE project_id = %(project_id)s
+        """
+        
+        logger.info(f"[NOTIFICATION] Querying project details from database")
+        project_df = read_from_mysql_with_params(
+            project_query,
+            {'project_id': project_id},
+            tenant
+        )
+        
+        if project_df.empty:
+            logger.warning(f"[NOTIFICATION] Project {project_id} not found in database")
+            return
+        
+        project_name = project_df.iloc[0]['project_name']
+        project_manager = project_df.iloc[0].get('project_manager')
+        
+        logger.info(f"[NOTIFICATION] Project name: {project_name}")
+        logger.info(f"[NOTIFICATION] Project manager raw value: {project_manager}")
+        
+        # Parse project_manager JSON to get list of emails
+        project_manager_emails = []
+        if project_manager:
+            try:
+                if isinstance(project_manager, str):
+                    project_manager_emails = json.loads(project_manager)
+                    logger.info(f"[NOTIFICATION] Parsed project_manager from JSON string: {project_manager_emails}")
+                elif isinstance(project_manager, list):
+                    project_manager_emails = project_manager
+                    logger.info(f"[NOTIFICATION] Project_manager is already a list: {project_manager_emails}")
+            except Exception as e:
+                logger.error(f"[NOTIFICATION] Error parsing project_manager: {str(e)}")
+        else:
+            logger.warning(f"[NOTIFICATION] project_manager field is NULL or empty")
+        
+        if not project_manager_emails:
+            logger.warning(f"[NOTIFICATION] No project managers assigned to project {project_id}, skipping notification")
+            return
+        
+        # Create notification directly in database
+        notification_header = f"Subtasks Auto-Generated for {project_name}"
+        notification_description = f"The system has automatically generated {subtask_count} subtasks from {parent_task_count} parent task(s) for project '{project_name}'. These subtasks are ready for assignment and include AI-generated tags and descriptions."
+        notification_type = "INFO"
+        
+        # Convert project_manager_emails to JSON string for database
+        related_users_json = json.dumps(project_manager_emails)
+        
+        logger.info(f"[NOTIFICATION] Creating notification in database")
+        logger.info(f"   Header: {notification_header}")
+        logger.info(f"   Type: {notification_type}")
+        logger.info(f"   Recipients: {project_manager_emails}")
+        
+        # Insert notification into database
+        insert_notification_query = """
+        INSERT INTO notifications (
+            header,
+            description,
+            related_users,
+            notification_type,
+            is_read,
+            created_at,
+            updated_at
+        ) VALUES (
+            :header,
+            :description,
+            :related_users,
+            :notification_type,
+            FALSE,
+            NOW(),
+            NOW()
+        )
+        """
+        
+        result = execute_query(
+            insert_notification_query,
+            {
+                'header': notification_header,
+                'description': notification_description,
+                'related_users': related_users_json,
+                'notification_type': notification_type
+            },
+            tenant
+        )
+        
+        if result:
+            logger.info(f"✅ [NOTIFICATION] Successfully created notification for {len(project_manager_emails)} project manager(s)")
+        else:
+            logger.error(f"❌ [NOTIFICATION] Failed to insert notification into database")
+            
+    except Exception as e:
+        logger.error(f"❌ [NOTIFICATION] Exception in create_subtask_notification: {str(e)}")
+        logger.exception(e)
+
+# -----------------------
 # Main orchestrator - All subtasks with dynamic tags
 # -----------------------
 def split_backlog_tasks(project_id, tenant):
@@ -396,6 +510,14 @@ def split_backlog_tasks(project_id, tenant):
                 "is_jira":0
             }, tenant)
             created += 1
+
+    # Create notification for project managers after subtask creation
+    if created > 0:
+        logger.info(f"Attempting to create notification for project {project_id}")
+        try:
+            create_subtask_notification(project_id, len(backlog), created, tenant)
+        except Exception as e:
+            logger.error(f"Failed to create notification, but subtasks were created successfully: {str(e)}")
 
     return {
         "success": True,
