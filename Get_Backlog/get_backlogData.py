@@ -36,7 +36,7 @@ def get_all_project(tenant):
         List of project dictionaries with project_id, project_name, and key
     """
     try:
-        project_query = "SELECT project_id, project_name, `key` FROM projects where project_id = 10270"
+        project_query = "SELECT project_id, project_name, `key` FROM projects where project_id = 10237"
         projects_df = read_from_mysql_with_params(project_query, {}, tenant)
         
         # Check if DataFrame is empty before converting
@@ -232,9 +232,18 @@ def transform_jira_issue(issue, project_id):
         else:
             priority = None
         
-        # Extract assignee
+        # Extract assignee - use email instead of display name
         assignee_obj = fields.get('assignee', {})
-        assignee = assignee_obj.get('displayName') if assignee_obj else None
+        if assignee_obj:
+            logger.info(f"Assignee object for {issue_key}: {assignee_obj}")
+            assignee = assignee_obj.get('emailAddress')
+            if assignee:
+                logger.info(f"Found assignee email '{assignee}' for issue {issue_key}")
+            else:
+                logger.warning(f"No emailAddress found in assignee object for issue {issue_key}")
+        else:
+            assignee = None
+            logger.info(f"No assignee set for issue {issue_key}")
         
         # Extract description
         description = fields.get('description', '')
