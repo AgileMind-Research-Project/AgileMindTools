@@ -1,0 +1,21 @@
+summary,description,issue_type,status,priority,severity,assignee,story_points,sprint,tags
+User profile update not saving,Changes made to user profile are not persisted.,bug,todo,medium,major,,3,,profile|backend
+Avatar upload fails,Users cannot upload or change profile pictures.,bug,todo,low,minor,,2,,profile|media
+Two-factor authentication missing,Implement optional two-factor authentication for accounts.,story,todo,high,,,5,,security|2fa
+Account lockout after failed attempts,Lock user accounts after multiple failed login attempts.,story,todo,high,,,3,,security|auth
+Export project data to CSV,Allow users to export project and backlog data.,story,todo,medium,,,3,,export|reporting
+Import backlog from CSV,Enable bulk backlog creation via CSV upload.,story,todo,medium,,,5,,import|backlog
+Sprint velocity calculation incorrect,Velocity is calculated using incomplete sprint data.,bug,todo,medium,major,,3,,sprint|metrics
+Burndown chart not updating,Burndown chart does not refresh after status changes.,bug,todo,medium,major,,3,,charts|agile
+Time zone causes date mismatch,Sprint start and end dates shift for some users.,bug,todo,high,major,,3,,timezone|dates
+Comments not loading on tasks,Task comments fail to load intermittently.,bug,todo,low,minor,,2,,comments|ui
+Mention notifications not triggered,@mentions do not notify tagged users.,bug,todo,medium,major,,3,,notifications|mentions
+File attachment size not validated,Large files can be uploaded without restriction.,bug,todo,medium,major,,3,,attachments|security
+Role management UI confusing,Admins struggle to manage roles and permissions.,story,todo,low,,,3,,ux|rbac
+Bulk status update for tasks,Allow multiple tasks to be updated at once.,story,todo,medium,,,5,,productivity|bulk
+Sprint goal not visible,Sprint goal text is not shown on sprint board.,bug,todo,low,minor,,2,,sprint|ui
+Inactive users still assignable,Deactivated users appear in assignee list.,bug,todo,medium,major,,3,,users|assignment
+Add dark mode support,Provide optional dark theme for UI.,story,todo,low,,,5,,ui|theme
+Websocket connection drops realtime updates,Live updates stop after some time.,bug,todo,high,major,,5,,realtime|websocket
+Access logs not retained,Server access logs are not stored as per policy.,bug,todo,medium,major,,3,,logging|compliance
+Release notes generation,Automatically generate release notes per sprint.,story,todo,medium,,,3,,release|automation

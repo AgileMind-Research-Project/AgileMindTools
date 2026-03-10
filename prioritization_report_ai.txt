@@ -1,0 +1,52 @@
+======================================================================
+ENHANCED AI BACKLOG PRIORITIZATION REPORT
+Trained on: Historical Data | Applied to: Current Backlog
+======================================================================
+Generated: 2026-01-13 01:30:55.358757
+
+Training Data Size: 42 items
+Backlog Size: 20 items
+
+Model Configuration:
+  - Embedding Model: all-MiniLM-L6-v2
+  - PCA Components: 10 (explaining 66.5% variance)
+  - Clustering Quality: 0.040
+  - Ensemble Prioritization: Enabled
+
+Learned Coefficients:
+  - Priority Weight: 2.000
+  - Severity Weight: 1.538
+  - Bug Boost: 1.026
+
+Feature Analysis:
+  - Avg Story Points: 0.0
+  - Items with Dependencies: 3
+  - Blocking Tasks: 0
+  - Backend Tasks: 2
+  - Frontend Tasks: 4
+  - DevOps Tasks: 0
+  - Avg Age (days): 0
+
+----------------------------------------------------------------------
+PRIORITIZED BACKLOG:
+----------------------------------------------------------------------
+# 1 | Time zone causes date mismatch                     | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+# 2 | Websocket connection drops realtime updates        | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+# 3 | Inactive users still assignable                    | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+# 4 | Mention notifications not triggered                | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+# 5 | User profile update not saving                     | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+# 6 | File attachment size not validated                 | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+# 7 | Sprint velocity calculation incorrect              | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+# 8 | Burndown chart not updating                        | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+# 9 | Access logs not retained                           | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+#10 | Comments not loading on tasks                      | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Should Have
+#11 | Avatar upload fails                                | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Should Have
+#12 | Sprint goal not visible                            | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Should Have
+#13 | Account lockout after failed attempts              | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+#14 | Two-factor authentication missing                  | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+#15 | Export project data to CSV                         | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Won't Have (This Sprint)
+#16 | Import backlog from CSV                            | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Won't Have (This Sprint)
+#17 | Bulk status update for tasks                       | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Could Have
+#18 | Release notes generation                           | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Could Have
+#19 | Add dark mode support                              | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+#20 | Role management UI confusing                       | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Must Have

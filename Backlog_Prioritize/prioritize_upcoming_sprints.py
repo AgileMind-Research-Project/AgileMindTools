@@ -67,7 +67,7 @@ def transform_backlog_to_priority_format(backlog_items, project_id):
                 'status': item.get('status', 'todo'),
                 'priority': item.get('priority', 'medium'),
                 'assignee': item.get('assignee'),
-                'story_points': 3,  # Default story points - TODO: could be estimated based on complexity
+                'story_points': item.get('story_points') if item.get('story_points') and item.get('story_points') > 0 else (item.get('story_point_estimate') if item.get('story_point_estimate') and item.get('story_point_estimate') > 0 else 3),
                 'sprint': None,
                 'tags': tags
             }
@@ -116,6 +116,7 @@ def get_historical_training_data(tenant):
             pb.tags,
             pb.estimated_hours,
             pb.story_points,
+            pb.story_point_estimate,
             pbp.rank as actual_completed_rank,
             pbp.sprint_id
         FROM project_backlog_priority pbp
@@ -167,8 +168,12 @@ def get_historical_training_data(tenant):
         else:
             df['severity'] = 'major'
         
-        # Ensure story_points has valid values
-        df['story_points'] = df['story_points'].fillna(3)
+        # Ensure story_points has valid values - fallback to story_point_estimate
+        df['story_points'] = df.apply(
+            lambda r: r['story_points'] if pd.notna(r['story_points']) and r['story_points'] > 0 
+            else (r['story_point_estimate'] if pd.notna(r['story_point_estimate']) and r['story_point_estimate'] > 0 else 3),
+            axis=1
+        )
         
         logger.info(f"Transformed {len(df)} database records to training format")
         logger.info(f"Columns available: {df.columns.tolist()}")
@@ -292,16 +297,17 @@ def get_or_create_sprint(project_id, next_sprint_start_date, sprint_size, tenant
         return None
 
 
-def save_priorities_to_database(project_id, prioritized_df, tenant, sprint_id=None):
+def save_priorities_to_database(project_id, prioritized_df, tenant, sprint_id=None, prioritize_task_count=15):
     """
     Save prioritized backlog items to project_backlog_priority table.
-    Only saves rank 1-15 items and creates a CSV file with this filtered data.
+    Only saves top ranked items based on prioritize_task_count (default: 15).
     
     Args:
         project_id: Project ID
-        prioritized_df: DataFrame with prioritized backlog items (output from train_and_prioritize)
+        prioritized_df: DataFrame with prioritized backlog items
         tenant: Tenant name/database schema
-        sprint_id: Sprint ID to assign (OPTIONAL - can be NULL, added later when sprint starts)
+        sprint_id: Sprint ID to assign
+        prioritize_task_count: Number of top items to save (comes from projects table)
     
     Returns:
         Number of items saved
@@ -311,27 +317,30 @@ def save_priorities_to_database(project_id, prioritized_df, tenant, sprint_id=No
             logger.info("No items to save")
             return 0
         
-        # Filter only rank 1-15 items
-        top_15_df = prioritized_df[prioritized_df['priority_rank'] <= 15].copy()
+        # Use prioritize_task_count for filtering (default to 15 if None)
+        task_limit = prioritize_task_count if prioritize_task_count is not None else 15
         
-        if top_15_df.empty:
-            logger.info("No items in rank 1-15 range")
+        # Filter only top ranked items
+        top_df = prioritized_df[prioritized_df['priority_rank'] <= task_limit].copy()
+        
+        if top_df.empty:
+            logger.info(f"No items in rank 1-{task_limit} range")
             return 0
         
-        logger.info(f"Filtered {len(top_15_df)} items with rank 1-15 from {len(prioritized_df)} total items")
+        logger.info(f"Filtered {len(top_df)} items with rank 1-{task_limit} from {len(prioritized_df)} total items")
         
-        # Create CSV file with top 15 ranked items
+        # Create CSV file with top ranked items
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        csv_filename = f"project_{project_id}_top15_priority_{timestamp}.csv"
+        csv_filename = f"project_{project_id}_top{task_limit}_priority_{timestamp}.csv"
         csv_path = os.path.join(SCRIPT_DIR, csv_filename)
         
         # Select relevant columns for CSV export
         csv_columns = ['priority_rank', 'id', 'name', 'description', 'issue_type', 
-                      'priority', 'status', 'WSJF', 'moscow_category', 'assignee']
+                      'priority', 'status', 'story_points', 'WSJF', 'moscow_category', 'assignee']
         
         # Filter columns that exist in the dataframe
-        available_columns = [col for col in csv_columns if col in top_15_df.columns]
-        csv_df = top_15_df[available_columns].copy()
+        available_columns = [col for col in csv_columns if col in top_df.columns]
+        csv_df = top_df[available_columns].copy()
         
         # Save to CSV
         csv_df.to_csv(csv_path, index=False, encoding='utf-8')
@@ -351,8 +360,8 @@ def save_priorities_to_database(project_id, prioritized_df, tenant, sprint_id=No
         
         success_count = 0
         
-        # Only save rank 1-15 items to database
-        for _, row in top_15_df.iterrows():
+        # Only save top ranked items to database
+        for _, row in top_df.iterrows():
             try:
                 # Prepare data for insertion with sprint_id
                 data = {
@@ -370,7 +379,7 @@ def save_priorities_to_database(project_id, prioritized_df, tenant, sprint_id=No
                 logger.error(f"Error inserting priority for item {row.get('id')}: {str(e)}")
                 continue
         
-        logger.info(f"Successfully saved {success_count} priority rankings (rank 1-15) for project {project_id}")
+        logger.info(f"Successfully saved {success_count} priority rankings (top {task_limit}) for project {project_id}")
         
         # After saving priorities, create notification for project managers
         logger.info(f"Attempting to create notification for project {project_id}")
@@ -555,15 +564,21 @@ def run_prioritization_for_project(project_data, historical_csv_path, tenant):
             )
         
         # Save priorities to database (sprint_id will be NULL, added later when sprint starts)
-        logger.info(f"Saving priorities to database (sprint_id will be added later)")
-        items_saved = save_priorities_to_database(project_id, prioritized_df, tenant, sprint_id=None)
+        logger.info(f"Saving priorities to database using prioritize_task_count: {project_data.get('prioritize_task_count', 15)}")
+        items_saved = save_priorities_to_database(
+            project_id=project_id, 
+            prioritized_df=prioritized_df, 
+            tenant=tenant, 
+            sprint_id=None,
+            prioritize_task_count=project_data.get('prioritize_task_count')
+        )
         
         return {
             'project_id': project_id,
             'project_name': project_name,
             'items_prioritized': len(prioritized_df),
             'items_saved': items_saved,
-            'top_5_items': prioritized_df[['priority_rank', 'name', 'issue_type', 'WSJF', 'moscow_category']].head(5).to_dict('records')
+            'top_5_items': prioritized_df[['priority_rank', 'name', 'issue_type', 'story_points', 'WSJF', 'moscow_category']].head(5).to_dict('records')
         }
         
     except Exception as e:
@@ -761,7 +776,7 @@ if __name__ == "__main__":
                     print(f"\n   Top 5 Priority Items:")
                     for item in project['top_5_items']:
                         print(f"      #{item['priority_rank']} - {item['name'][:60]}")
-                        print(f"         Type: {item['issue_type']} | WSJF: {item['WSJF']:.2f} | MoSCoW: {item['moscow_category']}")
+                        print(f"         Type: {item['issue_type']} | SP: {item['story_points']} | WSJF: {item['WSJF']:.2f} | MoSCoW: {item['moscow_category']}")
                 
                 if project.get('error'):
                     print(f"   ERROR: {project['error']}")

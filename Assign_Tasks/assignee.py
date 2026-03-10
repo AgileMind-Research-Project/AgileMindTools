@@ -25,12 +25,13 @@ def fetch_developers_from_db(tenant, project):
                 email,
                 first_name,
                 last_name,
-                role,
+                roles,
                 status,
                 user_data
             FROM {tenant}
             WHERE status = 'ACTIVE'
                 AND JSON_CONTAINS(projects, '{project}')
+                AND JSON_CONTAINS(roles, '"DEVELOPER"', '$')
         """
         
         # Fetch data from database
@@ -218,11 +219,14 @@ def get_subtasks_by_parent_ids(parent_ids, tenant_db):
         
         # Parse tags JSON if exists
         for task in subtasks:
-            if task.get('tags') and isinstance(task['tags'], str):
+            tags_val = task.get('tags')
+            if tags_val and isinstance(tags_val, str):
                 try:
-                    task['tags'] = json.loads(task['tags'])
+                    task['tags'] = json.loads(tags_val)
                 except:
                     task['tags'] = []
+            elif tags_val is None:
+                task['tags'] = []
         
         return subtasks
     
@@ -334,14 +338,15 @@ def assign_tasks_to_developers(project_id, tenant_table, tenant_db):
             best_score = -1
             
             # Extract task requirements from tags
-            task_tags = task.get('tags', [])
-            task_type = task.get('issue_type', '').lower()
+            task_tags = task.get('tags') or []
+            task_type = (task.get('issue_type') or '').lower()
             
             for developer in developers:
                 dev_email = developer['email']
-                dev_stack = developer.get('stack', [])
-                dev_techs = [t.lower() for t in developer.get('technologies', [])]
-                dev_exp = developer.get('experience_years', 0)
+                dev_stack = developer.get('stack') or []
+                raw_techs = developer.get('technologies') or []
+                dev_techs = [str(t).lower() for t in raw_techs]
+                dev_exp = developer.get('experience_years', 0) or 0
                 
                 # Calculate match score
                 score = 0
@@ -380,9 +385,9 @@ def assign_tasks_to_developers(project_id, tenant_table, tenant_db):
                     'assignee': best_match,
                     'summary': task['summary'],
                     'issue_type': task['issue_type'],
-                    'story_points': task.get('story_points', 0)
+                    'story_points': task.get('story_points') or 0
                 })
-                developer_workload[best_match] += task.get('story_points', 1)
+                developer_workload[best_match] += task.get('story_points') or 1
         
         logging.info(f"Successfully assigned {len(assignments)} tasks")
         return assignments

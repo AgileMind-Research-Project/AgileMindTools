@@ -1,0 +1,16 @@
+priority_rank,id,name,description,issue_type,priority,status,story_points,WSJF,moscow_category,assignee
+1,TAM-198,Project timeline and roadmap creation,Develop milestone roadmap.,change,high,todo,2.0,9.319966998718431,Must Have,lahiru.sa.200011@gmail.com
+2,TAM-189,Project kickoff meeting preparation,Prepare agenda and stakeholder overview.,change,high,todo,3.0,6.555496849772571,Must Have,lahiru.sa.200011@gmail.com
+3,TAM-187,DevOps & Infrastructure Modernization Epic,"Improve CI/CD, logging, automation, and infrastructure stability.",feature,high,todo,3.0,6.543472544247874,Should Have,lahiru.sa.200011@gmail.com
+4,TAM-191,Define project scope document,Finalize scope and deliverables.,change,high,todo,3.0,6.0514043327380165,Must Have,lahiru.sa.200011@gmail.com
+5,TAM-195,Environment setup (Dev/Staging),Provision dev and staging environments.,change,high,todo,4.0,5.875581791530971,Should Have,lahiru.sa.200011@gmail.com
+6,TAM-190,Requirement gathering workshops,Conduct stakeholder workshops.,change,high,todo,3.0,5.845082625309207,Must Have,lahiru.sa.200011@gmail.com
+7,TAM-188,Payment & Checkout Optimization Epic,Enhance payment reliability and checkout performance.,feature,high,todo,3.0,4.957966453856716,Could Have,lahiru.sa.200011@gmail.com
+8,TAM-186,User Authentication & Security Epic,"Complete authentication system including OAuth2, rate limiting, and security scans.",feature,high,todo,3.0,4.794394268535689,Could Have,lahiru.sa.200011@gmail.com
+9,TAM-204,CI/CD Pipeline Modernization Feature,Refactor pipeline for microservices with parallel jobs.,story,high,todo,5.0,4.209003639221192,Should Have,lahiru.sa.200011@gmail.com
+10,TAM-203,OAuth2 Multi-Provider Login Feature,"Implement secure login via Google, Microsoft, and GitHub.",story,high,todo,6.0,3.3446727962994385,Could Have,lahiru.sa.200011@gmail.com
+11,TAM-207,Data export API,Provide export endpoints for data.,story,high,todo,6.0,3.1186248526722893,Won't Have (This Sprint),lahiru.sa.200011@gmail.com
+12,TAM-201,Refactor CI/CD pipeline for microservices,Improve deployment speed.,change,high,todo,7.0,3.010759244662817,Should Have,lahiru.sa.200011@gmail.com
+13,TAM-199,Security vulnerability scan,Perform SAST/DAST scans.,change,high,todo,6.0,2.307678683833671,Could Have,lahiru.sa.200011@gmail.com
+14,TAM-194,High-level system architecture design,Design system components.,change,high,todo,5.0,2.284121406471282,Must Have,lahiru.sa.200011@gmail.com
+15,TAM-206,Implement feature flag system,Add runtime feature flags safely.,story,high,todo,6.0,1.92721621605003,Won't Have (This Sprint),lahiru.sa.200011@gmail.com

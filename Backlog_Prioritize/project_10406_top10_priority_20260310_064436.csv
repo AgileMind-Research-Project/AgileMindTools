@@ -1,0 +1,11 @@
+priority_rank,id,name,description,issue_type,priority,status,story_points,WSJF,moscow_category,assignee
+1,FT-18,OAuth2 Multi-Provider Login Feature,"Implement secure login via Google, Microsoft, and GitHub.",feature,high,todo,3,7.993597023889479,Must Have,
+2,FT-21,Implement feature flag system,Add runtime feature flags safely.,story,high,todo,3,7.840616454331369,Should Have,
+3,FT-1,User Authentication & Security Epic,"Complete authentication system including OAuth2, rate limiting, and security scans.",story,high,todo,3,7.7418138186136884,Must Have,
+4,FT-14,Security vulnerability scan,Perform SAST/DAST scans.,story,high,todo,3,7.345490533703084,Could Have,
+5,FT-9,High-level system architecture design,Design system components.,story,high,todo,3,6.87600279032189,Could Have,
+6,FT-17,Optimize database queries,Add indexing and caching.,story,high,todo,3,6.541569291024017,Must Have,
+7,FT-15,Improve API rate limiting,Add throttling and quotas.,story,high,todo,3,6.51267125145601,Must Have,
+8,FT-23,Analytics dashboard enhancements,Add cohort filtering and real-time updates.,story,high,todo,3,6.341009518860048,Must Have,
+9,FT-24,User feedback module,Add in-app feedback and sentiment pipeline.,story,high,todo,3,6.1324797195171685,Should Have,
+10,FT-22,Data export API,Provide export endpoints for data.,story,high,todo,3,6.095913647140524,Should Have,

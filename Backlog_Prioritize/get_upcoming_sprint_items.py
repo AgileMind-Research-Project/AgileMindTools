@@ -42,9 +42,11 @@ def get_projects_with_upcoming_sprint(tenant, days_before=4):
             next_sprint_start_date,
             project_lead,
             architecture_type,
-            stack_type
+            stack_type,
+            prioritize_task_count
         FROM projects 
-        WHERE next_sprint_start_date = %(target_date)s
+        WHERE next_sprint_start_date = %(target_date)s AND project_id = '10406'
+        
         """
         
         projects_df = read_from_mysql_with_params(
@@ -95,7 +97,8 @@ def get_backlog_items_for_project(project_id, tenant):
             created_at,
             updated_at,
             severity,
-            story_points
+            story_points,
+            story_point_estimate
         FROM project_backlog 
         WHERE project_id = %(project_id)s
         AND status IN ('todo', 'in_progress')
@@ -189,6 +192,7 @@ def get_upcoming_sprint_backlog(tenant, days_before=4):
                 'project_lead': project.get('project_lead'),
                 'architecture_type': project.get('architecture_type'),
                 'stack_type': project.get('stack_type'),
+                'prioritize_task_count': project.get('prioritize_task_count'),
                 'backlog_items_count': len(backlog_items),
                 'backlog_items': backlog_items
             })

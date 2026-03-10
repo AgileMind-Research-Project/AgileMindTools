@@ -2,29 +2,44 @@
 AI BACKLOG PRIORITIZATION REPORT
 Trained on: GFG_FINAL.csv | Applied to: b.py backlog
 ============================================================
-Generated: 2026-01-06 07:16:28.526131
+Generated: 2026-02-25 06:05:54.595762
 
-Training Data Size: 15 items
-Backlog Size: 13 items
+Training Data Size: 49000 items
+Backlog Size: 28 items
 
 Learned Coefficients:
   - Priority Weight: 2.000
   - Severity Weight: 2.000
-  - Bug Boost: 1.300
+  - Bug Boost: 2.000
 
 ------------------------------------------------------------
 PRIORITIZED BACKLOG:
 ------------------------------------------------------------
-# 1 | Notification badge count incorrect                 | Type: bug   | WSJF:  4.36 | MoSCoW: Should Have
-# 2 | Security review & dependency audit                 | Type: story | WSJF:  9.05 | MoSCoW: Must Have
-# 3 | Project initialization & repo setup                | Type: story | WSJF:  6.69 | MoSCoW: Should Have
-# 4 | Deployment: staging environment                    | Type: story | WSJF:  5.96 | MoSCoW: Should Have
-# 5 | Automated tests: unit & integration                | Type: story | WSJF:  4.80 | MoSCoW: Could Have
-# 6 | Core API: CRUD for primary resource                | Type: story | WSJF:  4.53 | MoSCoW: Could Have
-# 7 | Backlog grooming & roadmap planning                | Type: story | WSJF:  2.53 | MoSCoW: Should Have
-# 8 | End-to-end (E2E) smoke tests                       | Type: story | WSJF:  8.43 | MoSCoW: Could Have
-# 9 | Data protection & backup plan                      | Type: story | WSJF:  6.30 | MoSCoW: Must Have
-#10 | User documentation & API docs                      | Type: story | WSJF:  5.96 | MoSCoW: Should Have
-#11 | Logging & monitoring baseline                      | Type: story | WSJF:  3.84 | MoSCoW: Must Have
-#12 | Legal & compliance checklist                       | Type: story | WSJF:  6.12 | MoSCoW: Must Have
-#13 | Performance baseline & profiling plan              | Type: story | WSJF:  2.29 | MoSCoW: Could Have
+# 1 | Login fails with valid credentials                 | Type: bug   | WSJF:  3.83 | MoSCoW: Must Have
+# 2 | Incorrect role permissions applied                 | Type: bug   | WSJF:  3.66 | MoSCoW: Must Have
+# 3 | Project list not loading                           | Type: bug   | WSJF:  3.23 | MoSCoW: Must Have
+# 4 | API returns 500 error intermittently               | Type: bug   | WSJF:  1.72 | MoSCoW: Must Have
+# 5 | Meeting audio not connecting                       | Type: bug   | WSJF:  1.59 | MoSCoW: Must Have
+# 6 | Comments not saved on issues                       | Type: bug   | WSJF:  5.14 | MoSCoW: Must Have
+# 7 | Sprint velocity calculated incorrectly             | Type: bug   | WSJF:  4.84 | MoSCoW: Must Have
+# 8 | Password reset email not sent                      | Type: bug   | WSJF:  4.65 | MoSCoW: Must Have
+# 9 | Sprint board drag-and-drop not working             | Type: bug   | WSJF:  4.31 | MoSCoW: Must Have
+#10 | User session expires too early                     | Type: bug   | WSJF:  4.20 | MoSCoW: Must Have
+#11 | File upload fails for large files                  | Type: bug   | WSJF:  3.20 | MoSCoW: Must Have
+#12 | Chat messages delivered with delay                 | Type: bug   | WSJF:  3.10 | MoSCoW: Must Have
+#13 | Timezone mismatch in reports                       | Type: bug   | WSJF:  9.74 | MoSCoW: Should Have
+#14 | Notification badge count incorrect                 | Type: bug   | WSJF:  9.31 | MoSCoW: Should Have
+#15 | Duplicate notifications sent                       | Type: bug   | WSJF:  4.74 | MoSCoW: Should Have
+#16 | Search returns incomplete results                  | Type: bug   | WSJF:  4.56 | MoSCoW: Should Have
+#17 | Legal & compliance checklist                       | Type: task  | WSJF:  2.55 | MoSCoW: Could Have
+#18 | Project initialization & repo setup                | Type: task  | WSJF:  1.70 | MoSCoW: Won't Have (This Sprint)
+#19 | Data protection & backup plan                      | Type: task  | WSJF:  1.56 | MoSCoW: Could Have
+#20 | Backlog grooming & roadmap planning                | Type: task  | WSJF:  1.46 | MoSCoW: Could Have
+#21 | Performance baseline & profiling plan              | Type: task  | WSJF:  1.02 | MoSCoW: Won't Have (This Sprint)
+#22 | Security review & dependency audit                 | Type: task  | WSJF:  1.02 | MoSCoW: Could Have
+#23 | User documentation & API docs                      | Type: task  | WSJF:  0.89 | MoSCoW: Won't Have (This Sprint)
+#24 | Logging & monitoring baseline                      | Type: task  | WSJF:  0.76 | MoSCoW: Could Have
+#25 | End-to-end (E2E) smoke tests                       | Type: task  | WSJF:  0.73 | MoSCoW: Won't Have (This Sprint)
+#26 | Deployment: staging environment                    | Type: task  | WSJF:  0.65 | MoSCoW: Won't Have (This Sprint)
+#27 | Automated tests: unit & integration                | Type: task  | WSJF:  0.49 | MoSCoW: Won't Have (This Sprint)
+#28 | Core API: CRUD for primary resource                | Type: story | WSJF:  0.31 | MoSCoW: Won't Have (This Sprint)

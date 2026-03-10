@@ -21,7 +21,8 @@ logger.setLevel(logging.INFO)
 # 2. Or use the API: /rest/api/3/field
 # 3. Or inspect element on a Jira issue page
 SEVERITY_FIELD_ID = 'customfield_10165'
-STORY_POINTS_FIELD_ID = 'customfield_10035'  # Story Points field
+STORY_POINTS_FIELD_ID = 'customfield_10035'  # Story Points field (Company-managed)
+STORY_POINT_ESTIMATE_FIELD_ID = 'customfield_10016'  # Story Point Estimate field (Team-managed)
 START_DATE_FIELD_ID = 'customfield_10015'    # Start Date field
 
 
@@ -315,6 +316,30 @@ def transform_jira_issue(issue, project_id):
             if story_points is not None:
                 logger.info(f"Found story points '{story_points}' in field '{STORY_POINTS_FIELD_ID}' for issue {issue_key}")
         
+        # Extract Story Point Estimate custom field (Team-managed project)
+        story_point_estimate = None
+        
+        # Try to extract story point estimate from the custom field
+        if STORY_POINT_ESTIMATE_FIELD_ID in fields and fields[STORY_POINT_ESTIMATE_FIELD_ID] is not None:
+            spe_value = fields[STORY_POINT_ESTIMATE_FIELD_ID]
+            
+            # Handle different data types for story point estimate
+            try:
+                # Value can be int, float, or string representing a number
+                if isinstance(spe_value, (int, float)):
+                    story_point_estimate = int(spe_value)
+                elif isinstance(spe_value, str):
+                    # Try to convert string to int
+                    story_point_estimate = int(float(spe_value))
+                else:
+                    logger.warning(f"Unexpected story point estimate format for issue {issue_key}: {type(spe_value)}")
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Could not parse story point estimate for issue {issue_key}: {spe_value} - {str(e)}")
+                story_point_estimate = None
+            
+            if story_point_estimate is not None:
+                logger.info(f"Found story point estimate '{story_point_estimate}' in field '{STORY_POINT_ESTIMATE_FIELD_ID}' for issue {issue_key}")
+        
         # Extract dates
         created_at = fields.get('created')
         updated_at = fields.get('updated')
@@ -420,7 +445,8 @@ def transform_jira_issue(issue, project_id):
             'created_at': created_at,
             'updated_at': updated_at,
             'severity': severity,  # Add severity field
-            'story_points': story_points,  # Add story points field
+            'story_points': story_points,  # Add story points field (Company-managed)
+            'story_point_estimate': story_point_estimate,  # Add story point estimate (Team-managed)
             'estimated_hours': estimated_hours,  # Add estimated hours
             'start_date': start_date,  # Add start_date
             'end_date': end_date  # Add end_date
@@ -547,9 +573,9 @@ def insert_backlog_items(backlog_items, tenant):
         # The id (Jira issue key) is the primary key, so duplicates will be updated
         insert_query = """
         INSERT INTO project_backlog 
-        (id, project_id, summary, description, issue_type, status, priority, assignee, tags, created_at, updated_at, severity, story_points, estimated_hours, start_date, end_date)
+        (id, project_id, summary, description, issue_type, status, priority, assignee, tags, created_at, updated_at, severity, story_points, story_point_estimate, estimated_hours, start_date, end_date)
         VALUES 
-        (:id, :project_id, :summary, :description, :issue_type, :status, :priority, :assignee, :tags, :created_at, :updated_at, :severity, :story_points, :estimated_hours, :start_date, :end_date)
+        (:id, :project_id, :summary, :description, :issue_type, :status, :priority, :assignee, :tags, :created_at, :updated_at, :severity, :story_points, :story_point_estimate, :estimated_hours, :start_date, :end_date)
         ON DUPLICATE KEY UPDATE
             summary = VALUES(summary),
             description = VALUES(description),
@@ -561,6 +587,7 @@ def insert_backlog_items(backlog_items, tenant):
             updated_at = VALUES(updated_at),
             severity = VALUES(severity),
             story_points = VALUES(story_points),
+            story_point_estimate = VALUES(story_point_estimate),
             estimated_hours = VALUES(estimated_hours),
             start_date = VALUES(start_date),
             end_date = VALUES(end_date)

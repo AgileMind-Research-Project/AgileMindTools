@@ -16,7 +16,8 @@ def get_credential(tenant_name):
         or empty list if not found
     """
     client = boto3.client("secretsmanager")
-    
+    print(client,"sssssss")
+
     # Build the search pattern for the tenant
     search_pattern = f"tenant_{tenant_name}_"
     
