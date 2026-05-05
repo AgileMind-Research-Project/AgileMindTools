@@ -31,8 +31,9 @@ confidence_scorer = ConfidenceScorer()
 # Get all projects
 # -----------------------
 def get_all_project(tenant):
-    query = "SELECT project_id, project_name, `key` FROM projects WHERE project_id = 10406"
+    query = "SELECT project_id, project_name, `key` FROM projects"
     df = read_from_mysql_with_params(query, {}, tenant)
+    print(df,"check projets")
     return [] if df.empty else df.to_dict("records")
 
 # -----------------------
@@ -933,13 +934,13 @@ def split_backlog_tasks(project_id, tenant):
             all_tasks = all_tasks_df.to_dict("records")
             if ml_models.train_from_historical_data(all_tasks):
                 ml_models.save_models()
-                logger.info("✅ ML models trained and saved")
+                logger.info("ML models trained and saved")
             else:
-                logger.warning("⚠️ ML training failed, using NLP-only mode")
+                logger.warning("ML training failed, using NLP-only mode")
         else:
-            logger.warning("⚠️ No historical data for training, using NLP-only mode")
+            logger.warning("No historical data for training, using NLP-only mode")
     else:
-        logger.info("✅ ML models loaded from disk")
+        logger.info("ML models loaded from disk")
 
     created = 0
     confidence_scores = []  # Track confidence for reporting
@@ -1090,7 +1091,7 @@ def split_backlog_tasks(project_id, tenant):
     # Calculate average quality score
     avg_quality = sum(score['quality']['quality_score'] for score in confidence_scores) / max(len(confidence_scores), 1)
     
-    logger.info(f"✅ Task splitting complete: {created} subtasks created")
+    logger.info(f"Task splitting complete: {created} subtasks created")
     logger.info(f"   Overall confidence: {aggregate_confidence['overall_level']} ({aggregate_confidence['overall_confidence']:.2f})")
     logger.info(f"   Average quality: {avg_quality:.2f}")
     logger.info(f"   ML models used: {ml_models.is_trained}")
@@ -1116,5 +1117,7 @@ if __name__ == "__main__":
     tenant = "sliit"
     projects = get_all_project(tenant)
     if projects:
-        pid = projects[0]["project_id"]
-        print(json.dumps(split_backlog_tasks(pid, tenant), indent=2))
+        print("Processing Projects")
+        for project in projects:
+            pid = project["project_id"]
+            print(json.dumps(split_backlog_tasks(pid, tenant), indent=2))
