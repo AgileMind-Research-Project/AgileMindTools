@@ -101,7 +101,7 @@ def get_historical_training_data(tenant, project_id=None):
     """
     try:
         print("\n" + "="*80)
-        print("🗄️  LOADING HISTORICAL TRAINING DATA FROM DATABASE")
+        print("LOADING HISTORICAL TRAINING DATA FROM DATABASE")
         print("="*80)
         logger.info("Fetching historical training data from database...")
         print(f"Tenant: {tenant}")
@@ -170,14 +170,14 @@ def get_historical_training_data(tenant, project_id=None):
         
         if df.empty:
             if project_id:
-                print(f"❌ No historical training data found for project {project_id}")
+                print(f"No historical training data found for project {project_id}")
                 logger.info(f"No historical training data found for project {project_id}")
             else:
-                print("❌ No historical training data found (sprint_id IS NOT NULL)")
+                print("No historical training data found (sprint_id IS NOT NULL)")
                 logger.info("No historical training data found in database (sprint_id IS NOT NULL)")
             return pd.DataFrame()
         
-        print(f"\n✅ Retrieved {len(df)} historical records from database")
+        print(f"\n Retrieved {len(df)} historical records from database")
         
         # Show project breakdown
         project_summary = df.groupby('project_id').agg({
@@ -186,7 +186,7 @@ def get_historical_training_data(tenant, project_id=None):
             'severity': lambda x: x.value_counts().to_dict()
         }).rename(columns={'id': 'count'})
         
-        print(f"\n📋 Project Breakdown:")
+        print(f"\nProject Breakdown:")
         for proj_id, row in project_summary.iterrows():
             print(f"   Project {proj_id}: {int(row['count'])} records")
             print(f"      Priority: {row['priority']}")
@@ -556,12 +556,12 @@ def create_notification_for_project_managers(project_id, items_count, tenant):
         )
         
         if result:
-            logger.info(f"✅ [NOTIFICATION] Successfully created notification for {len(project_manager_emails)} project manager(s)")
+            logger.info(f"[NOTIFICATION] Successfully created notification for {len(project_manager_emails)} project manager(s)")
         else:
-            logger.error(f"❌ [NOTIFICATION] Failed to insert notification into database")
+            logger.error(f" [NOTIFICATION] Failed to insert notification into database")
             
     except Exception as e:
-        logger.error(f"❌ [NOTIFICATION] Exception in create_notification_for_project_managers: {str(e)}")
+        logger.error(f" [NOTIFICATION] Exception in create_notification_for_project_managers: {str(e)}")
         logger.exception(e)
         raise
 
@@ -608,14 +608,14 @@ def run_prioritization_for_project(project_data, historical_csv_path, tenant):
         MIN_HISTORICAL_RECORDS = 3
         
         print("\n" + "="*80)
-        print(f"🎯 PROJECT: {project_name} ({project_id})")
-        print(f"📦 Backlog Items to Prioritize: {len(transformed_backlog)}")
+        print(f" PROJECT: {project_name} ({project_id})")
+        print(f" Backlog Items to Prioritize: {len(transformed_backlog)}")
         print("="*80)
         
         # Run ML-based prioritization with exclusive data source logic
         # If DB data exists AND has enough samples, use ONLY DB data; otherwise fall back to CSV
         if not historical_db_data.empty and len(historical_db_data) >= MIN_HISTORICAL_RECORDS:
-            print(f"\n✅ USING DATABASE HISTORICAL DATA (Project-Specific)")
+            print(f"\nUSING DATABASE HISTORICAL DATA (Project-Specific)")
             print(f"   Project: {project_id}")
             print(f"   Records: {len(historical_db_data)}")
             print(f"   Min Required: {MIN_HISTORICAL_RECORDS}")
@@ -627,17 +627,17 @@ def run_prioritization_for_project(project_data, historical_csv_path, tenant):
             )
         else:
             if not historical_db_data.empty:
-                print(f"\n⚠️  INSUFFICIENT DATABASE DATA (Project-Specific)")
+                print(f"\n INSUFFICIENT DATABASE DATA (Project-Specific)")
                 print(f"   Project: {project_id}")
                 print(f"   Found: {len(historical_db_data)} records")
                 print(f"   Required: {MIN_HISTORICAL_RECORDS} minimum")
                 logger.warning(f"[INSUFFICIENT DB DATA] Found {len(historical_db_data)} database records for project {project_id}, but PCA requires minimum {MIN_HISTORICAL_RECORDS} samples")
             else:
-                print(f"\n⚠️  NO DATABASE HISTORICAL DATA (Project-Specific)")
+                print(f"\nNO DATABASE HISTORICAL DATA (Project-Specific)")
                 print(f"   Project: {project_id}")
                 print(f"   Falling back to CSV file")
             
-            print(f"\n🔄 USING CSV FALLBACK")
+            print(f"\nUSING CSV FALLBACK")
             print(f"   File: {historical_csv_path}")
             logger.info(f"[CSV FALLBACK] Using CSV for training: {historical_csv_path}")
             prioritized_df = train_and_prioritize(
@@ -656,7 +656,7 @@ def run_prioritization_for_project(project_data, historical_csv_path, tenant):
             prioritize_task_count=project_data.get('prioritize_task_count')
         )
         
-        print(f"\n✅ PRIORITIZATION RESULTS FOR {project_name}")
+        print(f"\nPRIORITIZATION RESULTS FOR {project_name}")
         print(f"   Total Prioritized: {len(prioritized_df)}")
         print(f"   Saved to Database: {items_saved}")
         print("="*80 + "\n")
@@ -736,7 +736,7 @@ def prioritize_all_upcoming_sprints(tenant, days_before=4):
             total_saved += project_result.get('items_saved', 0)
         
         print("\n" + "="*80)
-        print("📊 PRIORITIZATION SUMMARY")
+        print("PRIORITIZATION SUMMARY")
         print("="*80)
         print(f"Projects Processed: {len(results)}")
         print(f"Total Items Prioritized: {total_prioritized}")
