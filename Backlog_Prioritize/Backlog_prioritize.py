@@ -25,7 +25,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
         2. Otherwise -> Use CSV file (GFG_FINAL.csv)
     """
     # -------------------------------------------------
-    # 1️⃣ Load historical data for training (Database or CSV)
+    # Load historical data for training (Database or CSV)
     # -------------------------------------------------
     print("\n" + "="*80)
     print("🔍 TRAINING DATA SOURCE IDENTIFICATION")
@@ -42,7 +42,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
         if 'name' not in hist_df.columns and 'summary' in hist_df.columns:
             hist_df['name'] = hist_df['summary']
     else:
-        print(f"⚠️  DATA SOURCE: CSV FILE (Fallback)")
+        print(f"DATA SOURCE: CSV FILE (Fallback)")
         print(f"   File: {historical_csv_path}")
         hist_df = pd.read_csv(historical_csv_path)
         print(f"   Records: {len(hist_df)}")
@@ -58,7 +58,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     hist_df['full_text'] = hist_df['name'].astype(str) + ". " + hist_df['description'].astype(str) + ". " + hist_df['tags'].astype(str)
     
     # -------------------------------------------------
-    # 2️⃣ Load backlog from b.py
+    # Load backlog from b.py
     # -------------------------------------------------
     print("Loading backlog from b.py...")
     df = pd.DataFrame(backlog_items)
@@ -67,7 +67,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     df['full_text'] = df['name'] + ". " + df['description'] + ". " + df['tags']
     
     # -------------------------------------------------
-    # 3️⃣ Semantic embeddings model (shared)
+    # Semantic embeddings model (shared)
     # -------------------------------------------------
     print("Loading AI embedding model...")
     model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -81,7 +81,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     embeddings = model.encode(df['full_text'].tolist(), show_progress_bar=True)
     
     # -------------------------------------------------
-    # 4️⃣ PCA training on historical data
+    # PCA training on historical data
     # -------------------------------------------------
     print("Training PCA on historical data...")
     pca = PCA(n_components=3)
@@ -98,9 +98,9 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     df['ai_score_3'] = scaler.fit_transform(semantic_features[:, [2]]).flatten()
     
     # -------------------------------------------------
-    # 5️⃣ Learn coefficients from historical completed rank
+    # Learn coefficients from historical completed rank
     # -------------------------------------------------
-    print("📊 TRAINING PHASE: Learning coefficients from historical data...")
+    print("TRAINING PHASE: Learning coefficients from historical data...")
     print(f"   Training Data Source: {training_source}")
     if 'actual_completed_rank' in hist_df.columns:
         train_df = hist_df.dropna(subset=['actual_completed_rank']).copy()
@@ -122,15 +122,15 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
             PRIORITY_COEFF = abs(lr.coef_[3]) if lr.coef_[3] != 0 else 1.0
             SEVERITY_COEFF = abs(lr.coef_[4]) if lr.coef_[4] != 0 else 1.2
             BUG_BOOST = abs(lr.coef_[5]) if lr.coef_[5] != 0 else 1.3
-            print(f"\n   ✅ LEARNED COEFFICIENTS:")
+            print(f"\n  LEARNED COEFFICIENTS:")
             print(f"      Priority Weight:  {PRIORITY_COEFF:.3f}")
             print(f"      Severity Weight:  {SEVERITY_COEFF:.3f}")
             print(f"      Bug Boost:        {BUG_BOOST:.3f}")
         else:
-            print(f"   ⚠️  No completed historical data found, using default coefficients...")
+            print(f" No completed historical data found, using default coefficients...")
             PRIORITY_COEFF, SEVERITY_COEFF, BUG_BOOST = 1.0, 1.2, 1.3
     else:
-        print(f"   ⚠️  No 'actual_completed_rank' column, using default coefficients...")
+        print(f"No 'actual_completed_rank' column, using default coefficients...")
         PRIORITY_COEFF, SEVERITY_COEFF, BUG_BOOST = 1.0, 1.2, 1.3
     
     # Normalize coefficients to reasonable range
@@ -139,7 +139,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     BUG_BOOST = max(1.0, min(2.0, BUG_BOOST))
     
     # -------------------------------------------------
-    # 6️⃣ Weight mappings (apply to backlog)
+    #  Weight mappings (apply to backlog)
     # -------------------------------------------------
     priority_map = {'high': 1.0, 'medium': 0.8, 'low': 0.6}
     severity_map = {'blocker': 2.0, 'critical': 1.8, 'major': 1.5, 'minor': 1.1, 'trivial': 0.8}
@@ -152,7 +152,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     )
     
     # -------------------------------------------------
-    # 7️⃣ WSJF Calculation
+    #  WSJF Calculation
     # -------------------------------------------------
     df['user_value'] = df['ai_score_1'] * df['priority_weight'] * df['severity_weight']
     df['time_criticality'] = df['ai_score_2'] * df['severity_weight']
@@ -168,7 +168,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     df['WSJF'] = df['cost_of_delay'] / df['story_points']
     
     # -------------------------------------------------
-    # 8️⃣ MoSCoW via KMeans (Optimized: Semantic Features + WSJF)
+    # MoSCoW via KMeans (Optimized: Semantic Features + WSJF)
     # -------------------------------------------------
     # Combine PCA features (3) with WSJF and Severity for more distinct clustering
     severity_order_num = {'blocker': 4, 'critical': 3, 'major': 2, 'minor': 1, 'trivial': 0}
@@ -220,7 +220,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     df['moscow_category'] = df.apply(bug_moscow_fix, axis=1)
     
     # -------------------------------------------------
-    # 9️⃣ Bug-first ranking
+    # Bug-first ranking
     # -------------------------------------------------
     severity_order = {'blocker': 1, 'critical': 2, 'major': 3, 'minor': 4, 'trivial': 5}
     df['is_bug'] = df['issue_type'] == 'bug'
@@ -236,7 +236,7 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
     df_sorted['priority_rank'] = range(1, len(df_sorted) + 1)
     
     # -------------------------------------------------
-    # 10️⃣ Export final prioritized backlog
+    #  Export final prioritized backlog
     # -------------------------------------------------
     df_sorted.to_csv('prioritized_backlog_ai.csv', index=False)
     
@@ -270,12 +270,12 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
             )
     
     print("\n" + "=" * 60)
-    print("✅ PRIORITIZATION COMPLETE!")
+    print("PRIORITIZATION COMPLETE!")
     print("=" * 60)
-    print(f"📚 Training Source: {training_source}")
-    print(f"📊 Items Prioritized: {len(df_sorted)}")
-    print(f"📁 Output saved to: prioritized_backlog_ai.csv")
-    print(f"📝 Report saved to: prioritization_report_ai.txt")
+    print(f"Training Source: {training_source}")
+    print(f"Items Prioritized: {len(df_sorted)}")
+    print(f"Output saved to: prioritized_backlog_ai.csv")
+    print(f"Report saved to: prioritization_report_ai.txt")
     print("=" * 60)
     
     return df_sorted
@@ -286,6 +286,6 @@ def train_and_prioritize(historical_csv_path, backlog_items, additional_historic
 # -------------------------------------------------
 if __name__ == "__main__":
     result = train_and_prioritize('GFG_FINAL.csv', backlog)
-    print("\n📊 Top 10 Prioritized Items:")
+    print("\nTop 10 Prioritized Items:")
     print(result[['priority_rank', 'name', 'issue_type', 'WSJF', 'moscow_category']].head(10).to_string(index=False))
 
