@@ -45,7 +45,7 @@ def get_projects_with_upcoming_sprint(tenant, days_before=4):
             stack_type,
             prioritize_task_count
         FROM projects 
-        WHERE next_sprint_start_date = %(target_date)s AND project_id = '10406'
+        WHERE next_sprint_start_date = %(target_date)s
         
         """
         

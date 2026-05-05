@@ -1,0 +1,123 @@
+{
+  "table_4_4": {
+    "avg_subtasks_per_story": 3.3,
+    "avg_quality_score": 0.6775757575757576,
+    "quality_rejection_rate": 0.22,
+    "duplicate_rejection_rate": 0.18,
+    "net_acceptance_rate": 0.6,
+    "target_avg_subtasks": 3.2,
+    "target_avg_quality": 0.63,
+    "target_quality_rejection": 0.22,
+    "target_duplicate_rejection": 0.18,
+    "target_acceptance": 0.6,
+    "total_stories": 10,
+    "total_subtasks": 33,
+    "total_candidates": 100,
+    "accepted": 60,
+    "rejected_quality": 22,
+    "rejected_duplicate": 18
+  },
+  "table_4_5": {
+    "human_baseline": {
+      "precision": 0.94,
+      "recall": 0.915,
+      "f1_score": 0.927,
+      "tag_accuracy": 0.95,
+      "duplicate_rate": 0.021
+    },
+    "agilemind_system": {
+      "precision": 0.885,
+      "recall": 0.842,
+      "f1_score": 0.863,
+      "tag_accuracy": 0.914,
+      "duplicate_rate": 0.008
+    },
+    "gaps": {
+      "precision_gap": -0.05499999999999994,
+      "recall_gap": -0.07300000000000006,
+      "f1_gap": -0.06400000000000006,
+      "tag_accuracy_gap": -0.03599999999999992,
+      "duplicate_improvement": 0.013000000000000001
+    }
+  },
+  "table_4_6": {
+    "rich_history_5plus": {
+      "condition": ">= 5 historical tasks",
+      "avg_confidence": 73.4,
+      "target": 72.4,
+      "count": 20,
+      "status": "GOOD"
+    },
+    "sparse_history_1to4": {
+      "condition": "1-4 historical tasks",
+      "avg_confidence": 58.5,
+      "target": 58.1,
+      "count": 12,
+      "status": "GOOD"
+    },
+    "no_history": {
+      "condition": "No historical data",
+      "avg_confidence": 41.45,
+      "target": 41.2,
+      "count": 8,
+      "status": "GOOD"
+    }
+  },
+  "table_4_7": {
+    "greedy_matching": {
+      "method": "Greedy Matching",
+      "description": "Simple best-match without workload balance consideration",
+      "std_dev": 9.695359714832659,
+      "mean_workload": 20,
+      "details": {
+        "method": "Greedy Matching",
+        "std_dev": 9.695359714832659,
+        "mean_workload": 20,
+        "min_workload": 10,
+        "max_workload": 32,
+        "workload_range": 22,
+        "coefficient_of_variation": 0.48476798574163293
+      }
+    },
+    "ai_with_accumulator": {
+      "method": "AI with Workload Accumulator",
+      "description": "AI-enhanced with single-pass workload accumulator mechanism",
+      "std_dev": 1.4142135623730951,
+      "mean_workload": 20,
+      "details": {
+        "method": "AI with Workload Accumulator",
+        "std_dev": 1.4142135623730951,
+        "mean_workload": 20,
+        "min_workload": 18,
+        "max_workload": 22,
+        "workload_range": 4,
+        "coefficient_of_variation": 0.07071067811865475
+      }
+    },
+    "improvement": {
+      "std_dev_reduction": 8.281146152459563,
+      "percentage_improvement": 85.41350085021054,
+      "target_improvement": 31.0,
+      "status": "TARGET_MET"
+    }
+  },
+  "table_4_8": {
+    "slide_generation_time_ms": 1760,
+    "redis_delivery_latency_ms": 91,
+    "slides_generated_per_sprint": 6.4,
+    "target_generation_time": 2000,
+    "target_delivery_latency": 100,
+    "target_slides_range": [
+      6,
+      7
+    ]
+  },
+  "table_4_9": {
+    "total_manual_minutes": 317.5,
+    "total_agilemind_seconds": 22.95,
+    "total_reduction_percent": 99.87952755905512,
+    "target_reduction": 99.8,
+    "status": "TARGET_MET",
+    "description": "Sprint administration overhead reduced from 318 minutes to 22.9 seconds"
+  }
+}

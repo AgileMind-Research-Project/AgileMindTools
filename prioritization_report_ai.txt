@@ -1,52 +1,50 @@
-======================================================================
-ENHANCED AI BACKLOG PRIORITIZATION REPORT
-Trained on: Historical Data | Applied to: Current Backlog
-======================================================================
-Generated: 2026-01-13 01:30:55.358757
+============================================================
+AI BACKLOG PRIORITIZATION REPORT
+Trained on: GFG_FINAL.csv | Applied to: b.py backlog
+============================================================
+Generated: 2026-04-06 05:03:31.727442
 
-Training Data Size: 42 items
-Backlog Size: 20 items
-
-Model Configuration:
-  - Embedding Model: all-MiniLM-L6-v2
-  - PCA Components: 10 (explaining 66.5% variance)
-  - Clustering Quality: 0.040
-  - Ensemble Prioritization: Enabled
+Training Data Size: 15 items
+Backlog Size: 32 items
+Clustering Quality (Silhouette Score): 0.4852
 
 Learned Coefficients:
   - Priority Weight: 2.000
-  - Severity Weight: 1.538
-  - Bug Boost: 1.026
+  - Severity Weight: 1.200
+  - Bug Boost: 1.300
 
-Feature Analysis:
-  - Avg Story Points: 0.0
-  - Items with Dependencies: 3
-  - Blocking Tasks: 0
-  - Backend Tasks: 2
-  - Frontend Tasks: 4
-  - DevOps Tasks: 0
-  - Avg Age (days): 0
-
-----------------------------------------------------------------------
+------------------------------------------------------------
 PRIORITIZED BACKLOG:
-----------------------------------------------------------------------
-# 1 | Time zone causes date mismatch                     | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-# 2 | Websocket connection drops realtime updates        | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-# 3 | Inactive users still assignable                    | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-# 4 | Mention notifications not triggered                | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-# 5 | User profile update not saving                     | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-# 6 | File attachment size not validated                 | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-# 7 | Sprint velocity calculation incorrect              | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-# 8 | Burndown chart not updating                        | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-# 9 | Access logs not retained                           | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-#10 | Comments not loading on tasks                      | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Should Have
-#11 | Avatar upload fails                                | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Should Have
-#12 | Sprint goal not visible                            | Type: bug   | SP:  0 | WSJF:   inf | MoSCoW: Should Have
-#13 | Account lockout after failed attempts              | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-#14 | Two-factor authentication missing                  | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-#15 | Export project data to CSV                         | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Won't Have (This Sprint)
-#16 | Import backlog from CSV                            | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Won't Have (This Sprint)
-#17 | Bulk status update for tasks                       | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Could Have
-#18 | Release notes generation                           | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Could Have
-#19 | Add dark mode support                              | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Must Have
-#20 | Role management UI confusing                       | Type: story | SP:  0 | WSJF:   inf | MoSCoW: Must Have
+------------------------------------------------------------
+# 1 | OAuth2 Multi-Provider Login Feature                | Type: feature | WSJF:  7.99 | MoSCoW: Must Have
+# 2 | Implement feature flag system                      | Type: story | WSJF:  7.84 | MoSCoW: Must Have
+# 3 | User Authentication & Security Epic                | Type: story | WSJF:  7.74 | MoSCoW: Must Have
+# 4 | Security vulnerability scan                        | Type: story | WSJF:  7.35 | MoSCoW: Must Have
+# 5 | High-level system architecture design              | Type: story | WSJF:  6.88 | MoSCoW: Should Have
+# 6 | Optimize database queries                          | Type: story | WSJF:  6.54 | MoSCoW: Should Have
+# 7 | Improve API rate limiting                          | Type: story | WSJF:  6.51 | MoSCoW: Should Have
+# 8 | Analytics dashboard enhancements                   | Type: story | WSJF:  6.34 | MoSCoW: Should Have
+# 9 | User feedback module                               | Type: story | WSJF:  6.13 | MoSCoW: Should Have
+#10 | Data export API                                    | Type: story | WSJF:  6.10 | MoSCoW: Should Have
+#11 | Technology stack selection                         | Type: story | WSJF:  5.99 | MoSCoW: Should Have
+#12 | Create initial product backlog                     | Type: story | WSJF:  5.62 | MoSCoW: Could Have
+#13 | Define project scope document                      | Type: story | WSJF:  5.38 | MoSCoW: Could Have
+#14 | End-to-end testing for checkout flow               | Type: story | WSJF:  5.32 | MoSCoW: Should Have
+#15 | Payment & Checkout Optimization Epic               | Type: story | WSJF:  5.21 | MoSCoW: Should Have
+#16 | Project timeline and roadmap creation              | Type: story | WSJF:  5.18 | MoSCoW: Could Have
+#17 | Requirement gathering workshops                    | Type: story | WSJF:  5.08 | MoSCoW: Could Have
+#18 | Project kickoff meeting preparation                | Type: story | WSJF:  4.66 | MoSCoW: Could Have
+#19 | Environment setup (Dev/Staging)                    | Type: story | WSJF:  4.10 | MoSCoW: Won't Have (This Sprint)
+#20 | DevOps & Infrastructure Modernization Epic         | Type: story | WSJF:  3.94 | MoSCoW: Won't Have (This Sprint)
+#21 | CI/CD Pipeline Modernization Feature               | Type: feature | WSJF:  3.69 | MoSCoW: Won't Have (This Sprint)
+#22 | Refactor CI/CD pipeline for microservices          | Type: story | WSJF:  3.59 | MoSCoW: Won't Have (This Sprint)
+#23 | User session analytics                             | Type: story | WSJF:  6.27 | MoSCoW: Should Have
+#24 | Centralized Logging System Feature                 | Type: feature | WSJF:  6.14 | MoSCoW: Should Have
+#25 | Continuous localization support                    | Type: story | WSJF:  5.99 | MoSCoW: Should Have
+#26 | Define coding standards and guidelines             | Type: story | WSJF:  5.83 | MoSCoW: Could Have
+#27 | Accessibility improvements                         | Type: story | WSJF:  5.82 | MoSCoW: Should Have
+#28 | Feature rollout metrics                            | Type: story | WSJF:  5.62 | MoSCoW: Should Have
+#29 | Refactor payment service                           | Type: story | WSJF:  5.57 | MoSCoW: Should Have
+#30 | Initial risk assessment                            | Type: story | WSJF:  5.56 | MoSCoW: Should Have
+#31 | Refactor frontend state management                 | Type: story | WSJF:  5.34 | MoSCoW: Should Have
+#32 | Staging environment auto-cleanup                   | Type: story | WSJF:  3.44 | MoSCoW: Won't Have (This Sprint)

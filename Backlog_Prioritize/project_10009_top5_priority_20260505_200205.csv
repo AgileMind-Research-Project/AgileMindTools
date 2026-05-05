@@ -1,0 +1,6 @@
+priority_rank,id,name,description,issue_type,priority,status,story_points,WSJF,moscow_category,assignee
+1,SLD-10,Environment setup (Dev/Staging),Provision dev and staging environments.,story,high,todo,3,7.834109055374628,Must Have,
+2,SLD-16,Refactor CI/CD pipeline for microservices,Improve deployment speed.,story,high,todo,3,7.025104904213239,Must Have,
+3,SLD-19,CI/CD Pipeline Modernization Feature,Refactor pipeline for microservices with parallel jobs.,feature,high,todo,3,7.015006065368652,Must Have,
+4,SLD-18,OAuth2 Multi-Provider Login Feature,"Implement secure login via Google, Microsoft, and GitHub.",feature,high,todo,3,6.689345592598877,Must Have,
+5,SLD-4,Project kickoff meeting preparation,Prepare agenda and stakeholder overview.,story,high,todo,3,6.555496849772571,Must Have,
